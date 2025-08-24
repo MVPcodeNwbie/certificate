@@ -118,6 +118,21 @@ function toCardProps(a: RankedAchievement) {
     url: a.url ?? undefined
   };
 }
+
+function translateLabel(label: string): string {
+  switch (label.toLowerCase()) {
+    case 'evidence': return 'หลักฐาน';
+    case 'description': return 'รายละเอียด';
+    case 'recency': return 'ความใหม่';
+    case 'url': return 'ลิงก์';
+    case 'issuer': return 'ผู้ออก';
+    case 'orglevel': return 'ระดับพื้นที่';
+    case 'type': return 'ประเภท';
+    default:
+      if (label.toLowerCase().startsWith('ownerbonus')) return 'Owner Bonus';
+      return label;
+  }
+}
 </script>
 
 <div class="space-y-8">
@@ -270,15 +285,18 @@ function toCardProps(a: RankedAchievement) {
     <button type="button" class="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-label="ปิดหน้าต่างคะแนน (Esc เพื่อปิด)" on:click={closeExplain}></button>
     <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative focus:outline-none" tabindex="-1">
       <button bind:this={closeBtn} class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" on:click={closeExplain} aria-label="ปิด">✕</button>
-      <h4 id="score-explain-title" class="text-lg font-semibold mb-2">Score Breakdown</h4>
+      <h4 id="score-explain-title" class="text-lg font-semibold mb-2">รายละเอียดคะแนน</h4>
       <p id="score-explain-desc" class="text-sm text-gray-600 mb-4 truncate" title={explainTarget.title}>{explainTarget.title}</p>
       <ul class="space-y-1 text-sm">
         {#each explainData as c}
-          <li class="flex justify-between"><span>{c.label}</span><span class="font-mono">{c.value}</span></li>
+          <li class="flex justify-between">
+            <span>{translateLabel(c.label)}</span>
+            <span class="font-mono">{c.value}</span>
+          </li>
         {/each}
       </ul>
       <div class="border-t mt-4 pt-2 flex justify-between font-semibold">
-        <span>Total</span><span class="font-mono">{explainTotal}</span>
+        <span>รวม</span><span class="font-mono">{explainTotal}</span>
       </div>
       <div class="mt-4 text-right">
         <button class="px-4 py-2 rounded bg-gradient-to-r from-green-500 to-orange-500 text-white" on:click={closeExplain}>ปิด</button>
