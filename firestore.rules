@@ -1,0 +1,138 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isString(field, min, max) {
+      return field is string && field.size() >= min && field.size() <= max;
+    }
+
+
+    function isRole(r) { return ['admin','teacher','student'].hasAny([r]); }
+    function isType(t) { return ['certificate','diploma','award','competition','training','other'].hasAny([t]); }
+
+    function immutableCreatedAt() {
+      return !("createdAt" in resource.data) || request.resource.data.createdAt == resource.data.createdAt;
+    }
+
+    function validOptionalString(field, max) {
+      return !(field in request.resource.data) || (request.resource.data[field] is string && request.resource.data[field].size() <= max);
+    }
+
+    // Validate achievement document schema
+  function validAchievement() {
+      return
+        // Allowed keys only (prevent arbitrary data injection)
+        request.resource.data.keys().hasOnly([
+      'title','normalizedTitle','description','issuer','date','ownerRole','ownerName','type',
+  'url','filePath','fileUrl','academicYear','createdAt','updatedAt','createdAtTs','evidence','actorHash','tags','views','likes','orgLevel','orgNames'
+        ]) &&
+        // Required fields
+        isString(request.resource.data.title,1,150) &&
+        isRole(request.resource.data.ownerRole) &&
+        isString(request.resource.data.ownerName,1,120) &&
+        isType(request.resource.data.type) &&
+        // Timestamps basic numeric check
+        request.resource.data.createdAt is int &&
+        request.resource.data.updatedAt is int &&
+        // academicYear optional (Buddhist Era 2500-2600)
+        (!('academicYear' in request.resource.data) || (
+          request.resource.data.academicYear is int &&
+          request.resource.data.academicYear >= 2500 && request.resource.data.academicYear <= 2600
+        )) &&
+        // Optional length constraints
+        validOptionalString('description',2000) &&
+        validOptionalString('issuer',200) &&
+        validOptionalString('url',500) &&
+        validOptionalString('filePath',400) &&
+        validOptionalString('fileUrl',800) &&
+  validEvidenceArray() &&
+  validOptionalNumber('views', 0, 1000000000) &&
+  validOptionalNumber('likes', 0, 1000000000) &&
+  validOptionalTags() &&
+  ( !('orgLevel' in request.resource.data) || ['school','district','province','region','national'].hasAny([request.resource.data.orgLevel]) ) &&
+  ( !('orgNames' in request.resource.data) || (request.resource.data.orgNames is list && request.resource.data.orgNames.size() <= 5) );
+    }
+
+    // Validate optional evidence array (each item describes an uploaded file)
+    function validEvidenceArray() {
+      // Firestore rules DSL ไม่มี iterator ปลอดภัยแบบละเอียดที่รองรับอย่างเป็นทางการ (all/every)
+      // ลดเหลือการตรวจว่าเป็น list + จำกัดจำนวน (รายละเอียดตรวจในฝั่งเซิร์ฟเวอร์โค้ดเอง)
+      return !('evidence' in request.resource.data) || (
+        request.resource.data.evidence is list &&
+        request.resource.data.evidence.size() <= 20
+      );
+    }
+
+    function validOptionalNumber(field, min, max) {
+      return !(field in request.resource.data) || (request.resource.data[field] is int && request.resource.data[field] >= min && request.resource.data[field] <= max);
+    }
+
+    function validOptionalTags() {
+      return !( 'tags' in request.resource.data) || (
+        request.resource.data.tags is list && request.resource.data.tags.size() <= 30
+      );
+    }
+
+  match /achievements/{id} {
+      allow read: if true; // public readable
+      // Re-hardened: full schema validation required for create & update
+      allow create: if validAchievement();
+      allow update: if validAchievement() && immutableCreatedAt();
+      // Keep delete open for now (TODO tighten with token / rate-limit projection) 
+      allow delete: if true;
+    }
+
+  // Harden searchMetadata: only allow create/update if corresponding achievement exists
+  function validSearchMetadataCreate() {
+      return request.resource.data.keys().hasOnly(['fullText','title','facets','createdAt']) &&
+        request.resource.data.fullText is string &&
+        request.resource.data.title is string &&
+        request.resource.data.facets is map &&
+        request.resource.data.createdAt is int;
+  }
+  function validSearchMetadataUpdate() {
+      return request.resource.data.keys().hasOnly(['fullText','title','facets','updatedAt','createdAt']) &&
+        ( !('fullText' in request.resource.data) || request.resource.data.fullText is string ) &&
+        ( !('title' in request.resource.data) || request.resource.data.title is string ) &&
+        ( !('facets' in request.resource.data) || request.resource.data.facets is map ) &&
+        ( !('updatedAt' in request.resource.data) || request.resource.data.updatedAt is int );
+  }
+  match /searchMetadata/{id} {
+    allow read: if true;
+    allow create: if validSearchMetadataCreate() && exists(/databases/$(database)/documents/achievements/$(id));
+    allow update: if validSearchMetadataUpdate() && exists(/databases/$(database)/documents/achievements/$(id));
+    allow delete: if false; // immutable projection (delete only via achievement delete cascade)
+  }
+  
+  // CSP violation reports (append-only, hidden)
+  function validCspReport() {
+      return request.resource.data.keys().hasOnly(['ts','ua','blockedURI','documentURI','violatedDirective','originalPolicy']) &&
+        request.resource.data.ts is int &&
+        request.resource.data.ua is string && request.resource.data.ua.size() <= 400 &&
+        (!('blockedURI' in request.resource.data) || request.resource.data.blockedURI is string) &&
+        (!('documentURI' in request.resource.data) || request.resource.data.documentURI is string) &&
+        (!('violatedDirective' in request.resource.data) || request.resource.data.violatedDirective is string) &&
+        (!('originalPolicy' in request.resource.data) || request.resource.data.originalPolicy is string);
+  }
+  match /cspReports/{rid} {
+      allow read: if false;
+      allow create: if validCspReport();
+      allow update, delete: if false;
+  }
+  
+  // Audit logs: append-only; each client action creates a log entry
+  match /auditLogs/{logId} {
+      allow read: if false; // hide from public for now (adjust if needed)
+      allow create: if validAuditLog();
+      allow update, delete: if false;
+    }
+
+    function validAuditLog() {
+      return request.resource.data.keys().hasOnly(['eventType','refId','at','client']) &&
+        (request.resource.data.eventType is string && request.resource.data.eventType.size() <= 40) &&
+        (request.resource.data.refId is string && request.resource.data.refId.size() <= 200) &&
+        (request.resource.data.at is int) &&
+        (!('client' in request.resource.data) || (request.resource.data.client is map && request.resource.data.client.keys().hasOnly(['ua']) && request.resource.data.client.ua is string && request.resource.data.client.ua.size() <= 300));
+    }
+  }
+}

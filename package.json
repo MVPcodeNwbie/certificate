@@ -1,0 +1,50 @@
+{
+  "name": "certificate",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "svelte-kit sync && vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
+    "postinstall": "svelte-kit sync",
+    "test": "vitest run",
+    "analyze": "vite build --mode analyze",
+    "budget": "node scripts/bundle-budget.cjs",
+    "firebase:login": "firebase login",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage:rules",
+    "deploy": "npm run build && firebase deploy --only firestore:rules,storage:rules"
+  },
+  "cspHashScript": "node scripts/update-csp-hash.mjs",
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.3.1",
+    "@sveltejs/adapter-static": "^3.0.1",
+    "@sveltejs/kit": "^2.5.10",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16",
+  "@firebase/rules-unit-testing": "^3.0.3",
+  "@testing-library/svelte": "^5.1.0",
+  "@testing-library/user-event": "^14.5.2",
+  "jsdom": "^24.0.0",
+    "autoprefixer": "^10.4.21",
+    "firebase-tools": "^13.29.0",
+    "postcss": "^8.5.6",
+    "svelte": "^4.2.17",
+    "svelte-check": "^3.6.9",
+    "svelte-preprocess": "^5.1.4",
+    "tailwindcss": "3.4.17",
+    "tslib": "^2.6.3",
+    "typescript": "^5.5.4",
+  "vite": "^5.3.4",
+  "vitest": "^2.0.5",
+  "chart.js": "^4.4.4"
+  },
+  "dependencies": {
+    "firebase": "^10.14.1",
+  "firebase-admin": "^13.4.0",
+  "jspdf": "^2.5.1",
+  "jspdf-autotable": "^3.8.2"
+  }
+}

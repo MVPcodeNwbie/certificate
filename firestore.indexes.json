@@ -1,0 +1,63 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "achievements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerRole", "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "achievements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "ownerRole", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "achievements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "achievements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "academicYear", "order": "DESCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "searchMetadata",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "facets.role", "order": "ASCENDING" },
+        { "fieldPath": "facets.type", "order": "ASCENDING" },
+        { "fieldPath": "fullText", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "searchMetadata",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "facets.role", "order": "ASCENDING" },
+        { "fieldPath": "fullText", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "searchMetadata",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "facets.type", "order": "ASCENDING" },
+        { "fieldPath": "fullText", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
