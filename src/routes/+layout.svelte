@@ -36,7 +36,7 @@
 					<a href="/" class="nav-link {current === '/' ? 'nav-link-active' : ''}">หน้าแรก</a>
 					<a href="/achievements" class="nav-link {current.startsWith('/achievements') ? 'nav-link-active' : ''}">รายการทั้งหมด</a>
 					<a href="/submit" class="nav-link nav-link-active hidden sm:inline-flex gradient-brand-soft-x">บันทึกข้อมูล</a>
-					<button type="button" class="ml-2 inline-flex items-center px-3 py-2 rounded-button text-sm font-medium bg-neutral-200 hover:bg-neutral-300 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-600 transition" on:click={toggleTheme} aria-label="Toggle theme">
+					<button type="button" class="ml-2 inline-flex items-center px-3 py-2 rounded-button text-sm font-medium bg-neutral-200 hover:bg-neutral-300 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100 dark:hover:bg-neutral-600 transition" on:click={toggleTheme} aria-label="สลับธีม">
 						{#if $theme === 'dark'}☀️ สว่าง{:else}🌙 มืด{/if}
 					</button>
 				</nav>
