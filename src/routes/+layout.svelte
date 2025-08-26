@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-	<title>School Achievements</title>
+	<title>ระบบจัดการผลงาน</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 </svelte:head>
 

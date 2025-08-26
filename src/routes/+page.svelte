@@ -60,8 +60,8 @@ onMount(async () => {
 			</a>
 			<a href="/hall-of-fame" class="group p-4 rounded-xl border bg-white hover:shadow-md transition">
 				<div class="text-2xl">⭐</div>
-				<p class="mt-2 font-semibold text-gray-900 group-hover:text-green-600">Hall of Fame</p>
-				<p class="text-xs text-gray-500 mt-1">ผลงานเด่น</p>
+				<p class="mt-2 font-semibold text-gray-900 group-hover:text-green-600">ผลงานเด่น</p>
+				<p class="text-xs text-gray-500 mt-1">Hall of Fame</p>
 			</a>
 			<a href="/reports" class="group p-4 rounded-xl border bg-white hover:shadow-md transition">
 				<div class="text-2xl">📊</div>

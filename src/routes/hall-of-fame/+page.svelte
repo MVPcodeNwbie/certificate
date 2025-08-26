@@ -125,11 +125,11 @@ function translateLabel(label: string): string {
     case 'description': return 'รายละเอียด';
     case 'recency': return 'ความใหม่';
     case 'url': return 'ลิงก์';
-    case 'issuer': return 'ผู้ออก';
+  case 'issuer': return 'ผู้ออก';
     case 'orglevel': return 'ระดับพื้นที่';
     case 'type': return 'ประเภท';
     default:
-      if (label.toLowerCase().startsWith('ownerbonus')) return 'Owner Bonus';
+  if (label.toLowerCase().startsWith('ownerbonus')) return 'โบนัสเจ้าของ';
       return label;
   }
 }
@@ -137,17 +137,17 @@ function translateLabel(label: string): string {
 
 <div class="space-y-8">
   <div class="text-center space-y-4">
-    <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-orange-300">Hall of Fame</h1>
+  <h1 class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-orange-300">ผลงานเด่น</h1>
     <p class="text-gray-600 text-lg max-w-2xl mx-auto">
       ผลงานเด่นที่ได้รับการยอมรับ มีการจัดเก็บหลักฐานครบถ้วน และเป็นแรงบันดาลใจให้ผู้อื่น
     </p>
     <details class="max-w-3xl mx-auto text-left bg-white/70 backdrop-blur-sm border border-gray-200 rounded-lg p-4 group">
       <summary class="cursor-pointer font-medium text-green-800 flex items-center gap-2">
-        วิธีคิดคะแนน (Scoring)
+  วิธีคิดคะแนน
         <span class="text-xs text-green-700 group-open:rotate-90 transition-transform">▶</span>
       </summary>
       <div class="mt-3 space-y-3 text-sm text-gray-700 leading-relaxed">
-  <p>ระบบจัดอันดับ (0–100) แบ่งสัดส่วน: Evidence 10, Description 25, Recency 15, URL 5, Issuer 10, Org Level 15, Type 10, Owner Bonus 10.</p>
+  <p>ระบบจัดอันดับ (0–100) แบ่งสัดส่วน: หลักฐาน 10, รายละเอียด 25, ความใหม่ 15, ลิงก์ 5, ผู้ออก 10, ระดับพื้นที่ 15, ประเภท 10, โบนัสเจ้าของ 10.</p>
         <ul class="list-disc pl-5 space-y-1">
           <li><strong>หลักฐาน (Evidence)</strong>: มีไฟล์ ≥1 (10 คะแนน)</li>
           <li><strong>รายละเอียด (Description)</strong>: สเกลตามจำนวนอักษรจนเต็ม 25</li>
@@ -156,7 +156,7 @@ function translateLabel(label: string): string {
           <li><strong>ผู้ออก (Issuer)</strong>: มี/ยาวพอ +10</li>
           <li><strong>ระดับพื้นที่ (Org Level)</strong>: map สู่ 0–15 (national สูงสุด)</li>
           <li><strong>ประเภท (Type)</strong>: map สู่ 0–10 (award สูงสุด)</li>
-          <li><strong>Owner Bonus</strong>: รวมผลงานอื่นของเจ้าของ (ชิ้นที่ 2 ขึ้นไป *20 แบบมีเพดาน), log(จำนวนไฟล์รวม) ให้ผลตอบแทนลดหลั่น และความใหม่ล่าสุด (สามส่วนนี้ถูก normalize และ cap ที่ 0–10)</li>
+          <li><strong>โบนัสเจ้าของ</strong>: รวมผลงานอื่นของเจ้าของ (ชิ้นที่ 2 ขึ้นไป *20 แบบมีเพดาน), log(จำนวนไฟล์รวม) ให้ผลตอบแทนลดหลั่น และความใหม่ล่าสุด (สามส่วนนี้ถูก normalize และ cap ที่ 0–10)</li>
         </ul>
         <p class="text-xs text-gray-500">สูตรเต็มดูได้ที่ docs: <code>docs/scoring-formulas.md</code>. กำลังพัฒนา: แท็กเชิงความหมาย และ engagement (views / likes).</p>
       </div>
@@ -187,7 +187,7 @@ function translateLabel(label: string): string {
         <option value="student">นักเรียน</option>
       </select>
       <div class="flex items-center gap-2">
-        <label for="ownerWeightRange" class="text-sm text-gray-600">Owner Weight</label>
+  <label for="ownerWeightRange" class="text-sm text-gray-600">น้ำหนักโบนัส</label>
         <input id="ownerWeightRange" aria-label="Owner Weight" type="range" min="0" max="2" step="0.1" bind:value={ownerWeight} on:change={recomputeWeight} />
         <span class="text-sm w-8 text-center">{ownerWeight.toFixed(1)}</span>
       </div>
@@ -237,10 +237,10 @@ function translateLabel(label: string): string {
                   <AchievementCard {...toCardProps(item)} />
                   <div class="mt-1 text-[11px] text-gray-500 flex flex-wrap gap-2">
                     <span>🏅 {Math.round(item.hofScore)}</span>
-                    <span>base {Math.round(item.baseScore)}</span>
-                    <span>owner+ {Math.round(item.ownerBonus)}</span>
+                    <span>ฐาน {Math.round(item.baseScore)}</span>
+                    <span>โบนัส {Math.round(item.ownerBonus)}</span>
                     <span class="truncate max-w-[120px]" title={`ผลงานทั้งหมดเจ้าของ: ${item.ownerAggregate.count}`}>Σ{item.ownerAggregate.count}</span>
-          <button type="button" class="opacity-0 group-hover:opacity-100 transition-opacity underline text-blue-600" on:click|preventDefault={() => openExplain(item)}>explain</button>
+          <button type="button" class="opacity-0 group-hover:opacity-100 transition-opacity underline text-blue-600" on:click|preventDefault={() => openExplain(item)}>ดูคะแนน</button>
                   </div>
                 </a>
               </div>
